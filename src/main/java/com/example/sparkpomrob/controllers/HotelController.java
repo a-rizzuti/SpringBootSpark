@@ -1,13 +1,15 @@
 package com.example.sparkpomrob.controllers;
 
 
+import com.example.sparkpomrob.dto.RowDTO;
 import com.example.sparkpomrob.services.HotelService;
-import org.apache.spark.sql.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("hotel")
@@ -27,7 +29,7 @@ public class HotelController {
     }
 
     @GetMapping("nome")
-    Dataset<String> getHotelReview(@RequestParam String nome){
-        return this.service.getByHotel(nome);
+    List<RowDTO> getHotelReview(@RequestParam String nome){
+        return this.service.getByHotel(nome, 10);
     }
 }

@@ -19,8 +19,8 @@ public class HotelRepository {
 
     private SparkSession spark = null;
 
-
-    public void exampleQuery(Dataset<Row> data){
+    public void exampleQuery() throws IOException {
+        Dataset<Row> data = this.readDataset();
         System.out.println("------------******---------");
 
         System.out.println(Arrays.toString(data.columns()));
@@ -34,11 +34,11 @@ public class HotelRepository {
         System.out.println("-------******----------");
 
 
-        Dataset<Row> recensioniRusse = this.spark.sql("SELECT * FROM arena WHERE arena.Reviewer_Nationality  = \" Russia \" ");
+        Dataset<Row> recensioniRusse = this.spark.sql("SELECT * FROM arena WHERE arena.Reviewer_Nationality  = \" Russia \" LIMIT 10");
         recensioniRusse.show();
     }
 
-    public Dataset<Row> readDataset() throws IOException {
+    private Dataset<Row> readDataset() throws IOException {
 
         if(spark == null) this.initSpark();
         Resource resource = new ClassPathResource("Hotel_Reviews.csv");
@@ -46,16 +46,18 @@ public class HotelRepository {
 
         Dataset<Row> data = this.spark.read().option("header", "true").
                 option("inferSchema", "true").csv(datasetPath);
-        //data.show();
         return data;
     }
 
-    public Dataset<Row> getByName(String nome) throws IOException {
+
+    public Dataset<Row> getByName(String nome, int limit) throws IOException {
         System.out.println("Nome richiesto: "+ nome);
+
         Dataset<Row> ret = this.readDataset();
         ret.createOrReplaceTempView("recensioni");
 
-        return this.spark.sql("SELECT * FROM recensioni WHERE recensioni.Hotel_Name LIKE \"%"+ nome + "%\"");
+        return this.spark.sql("SELECT * FROM recensioni WHERE recensioni.Hotel_Name LIKE \"%"+ nome +
+                "%\" LIMIT " + limit);
 
     }
     private void initSpark() {
